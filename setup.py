@@ -35,9 +35,15 @@ setuptools.setup(
         'traitsui>=7.2.1',
         'PyQt5>=5.15.4',
         'pygments>=2.9.0',
-        'numpy>=1.21.1',
+        'numpy>=1.21.1,<=1.23.5',
         'matplotlib>=3.4.2'
     ],
+    extras_require = {
+        'build': [
+            "cx_freeze>=6.13",
+            "dmgbuild>=1.6"
+        ]
+    },
     python_requires='>=3.7,<3.10',
     package_data={
         pkg_name: [
