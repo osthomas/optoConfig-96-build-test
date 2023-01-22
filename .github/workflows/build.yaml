@@ -1,0 +1,116 @@
+name: build
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check guide is up to date
+        run: |
+          # This will fail if version numbers do not match
+          make check_version_number
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip wheel build
+
+      - name: Build package
+        run: |
+          python -m build
+          # Make a directory that matches the dist* glob in upload-artifact
+          # in order to upload the built package in a subdirectory.
+          mkdir dist_stub
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-archives
+          path: dist*
+
+
+  build-win:
+    runs-on: windows-latest
+
+    # First check if doc versions match
+    needs: [build-linux]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install ".[build]"
+
+      - name: Build package
+        run: |
+          mkdir -p build/win32
+          python freeze.py build
+
+      # - name: Compress package
+      #   shell: powershell
+      #   run: Compress-Archive build/win32/* windows.zip
+
+      - name: Compress package
+        run: 7z a -tzip windows.zip build/win32/*
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-archives
+          path: windows.zip
+
+
+  build-macos:
+    runs-on: macos-latest
+
+    # First check if doc versions match
+    needs: [build-linux]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install ".[build]"
+          brew install libiodbc
+          # cx_freeze looks for a library in a weird spot
+          mkdir -p /Applications/Postgres.app/Contents/Versions/9.6/lib/
+          ln -s /usr/local/opt/libpq/lib/libpq.5.dylib /Applications/Postgres.app/Contents/Versions/9.6/lib/libpq.5.dylib
+
+      - name: Build package
+        run: |
+          python freeze.py build
+          mv optoConfig96-*.dmg darwin.dmg
+
+      # - name: Setup upterm session
+      #   uses: lhotari/action-upterm@v1
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-archives
+          path: darwin.dmg
+
+
+  release:
+    needs: [build-win, build-macos, build-linux]
+    permissions:
+      contents: write
+    uses: ./.github/workflows/release.yaml
