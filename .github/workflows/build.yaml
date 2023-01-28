@@ -61,10 +61,6 @@ jobs:
           mkdir -p build/win32
           python freeze.py build
 
-      # - name: Compress package
-      #   shell: powershell
-      #   run: Compress-Archive build/win32/* windows.zip
-
       - name: Compress package
         run: 7z a -tzip windows.zip build/win32/*
       - uses: actions/upload-artifact@v3
@@ -99,9 +95,6 @@ jobs:
         run: |
           python freeze.py build
           mv optoConfig96-*.dmg darwin.dmg
-
-      # - name: Setup upterm session
-      #   uses: lhotari/action-upterm@v1
 
       - uses: actions/upload-artifact@v3
         with:
