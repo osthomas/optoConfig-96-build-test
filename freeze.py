@@ -251,55 +251,6 @@ with TempFile(name = main_script_name, contents = MAIN_SCRIPT):
 # Post-build and cleanup
 # ------------------------------------------------------------------------------
 
-# cx_freeze pulls in all of Qt5. We don't need a lot of that.
-if sys.platform in ("linux", "win32"):
-    qt5_path = os.path.join(raw_target, "lib", "PyQt5")
-elif sys.platform == "darwin":
-    qt5_path = os.path.join(raw_target, "Contents", "MacOS", "lib", "PyQt5")
-
-for unneeded in ["QtBluetooth",
-                 "QtDesigner",
-                 "QtHelp",
-                 "QtLocation",
-                 "QtMultimedia",
-                 "QtMultimediaWidgets",
-                 "QtNetwork",
-                 "QtNfc",
-                 "QtOpenGL",
-                 "QtQml",
-                 "QtQuick3D",
-                 "QtQuick",
-                 "QtQuickWidgets",
-                 "QtRemoteObjects",
-                 "QtSensors",
-                 "QtSerialPort",
-                 "QtSql",
-                 "QtTest",
-                 "QtTextToSpeech",
-                 "QtWebChannel",
-                 "QtWebSockets",
-                 "QtXml"
-                 ]:
-    # Extensions and locations differ by platform
-    if sys.platform == "darwin":
-        os.remove(os.path.join(raw_target, "Contents", "MacOS", unneeded))
-        shutil.rmtree(os.path.join(qt5_path, "Qt5", "lib", f"{unneeded}.framework"))
-        exts = ["abi3.so", "pyi"]
-    elif sys.platform == "win32":
-        os.remove(os.path.join(qt5_path, "Qt5", "bin", f"Qt5{unneeded[2:]}.dll"))
-        exts = ["pyd", "pyi"]
-    elif sys.platform == "linux":
-        os.remove(os.path.join(qt5_path, "Qt5", "lib", f"libQt5{unneeded[2:]}.so.5"))
-        exts = ["abi3.so", "pyi"]
-    for ext in exts:
-        os.remove(os.path.join(qt5_path, f"{unneeded}.{ext}"))
-
-
-shutil.rmtree(os.path.join(qt5_path, "bindings"))
-shutil.rmtree(os.path.join(qt5_path, "Qt5", "translations"))
-shutil.rmtree(os.path.join(qt5_path, "Qt5", "qml"))
-
-
 # WINDOWS
 if sys.platform == 'win32':
     # Need to include python3.dll, python3x.dll is not enough
