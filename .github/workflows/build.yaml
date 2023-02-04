@@ -91,6 +91,8 @@ jobs:
         run: |
           pyinstaller optoConfig96.spec
           chmod +x create_dmg.sh
+          # Sign after removal of offending packages (see optoConfig96.spec)
+          codesign -s - --force --all-architectures --timestamp --deep dist/optoConfig96.app
           ./create_dmg.sh
 
       - uses: actions/upload-artifact@v3
