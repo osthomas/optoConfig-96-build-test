@@ -69,7 +69,7 @@ jobs:
 
 
   build-macos:
-    runs-on: macos-latest
+    runs-on: macos-11
 
     # First check if doc versions match
     needs: [build-linux]
