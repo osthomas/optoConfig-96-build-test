@@ -61,7 +61,7 @@ jobs:
           pyinstaller optoConfig96.spec
 
       - name: Compress package
-        run: 7z a -tzip windows.zip dist/optoConfig96/*
+        run: 7z a -tzip windows.zip ./dist/*
       - uses: actions/upload-artifact@v3
         with:
           name: build-archives
