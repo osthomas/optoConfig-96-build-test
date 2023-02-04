@@ -2,8 +2,11 @@
 
 # To build: pyinstaller optoConfig96.spec
 
+import sys
+import subprocess
 from optoConfig96.version import __version__
-name = f"optoConfig96-{__version__}"
+
+name = f"optoConfig96"
 
 from PyInstaller.utils.hooks import copy_metadata, collect_submodules
 
@@ -50,7 +53,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name=name,
+    name=f"{name}-{__version__}",  # avoid name conflict with optoConfig96/resources dir
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -62,6 +65,7 @@ exe = EXE(
     codesign_identity=None,
     entitlements_file=None,
 )
+
 coll = COLLECT(
     exe,
     a.binaries,
@@ -71,4 +75,16 @@ coll = COLLECT(
     upx=True,
     upx_exclude=[],
     name=name
+)
+
+# NOTE:
+# As of 2023-02-04, pyinstaller 5.7.0, the call to `codesign` fails due to
+# subcomponents in PyQt5/qml/QtQml. Several unneeded QT components are included
+# by pyinstaller, of which this is one. Removing this gets rid of the error,
+# but the pop up preventing launch of the app after download remains. Thus,
+# removing these unneeded components is not worth the hassle.
+app = BUNDLE(
+    coll,
+    name = name + ".app",
+    icon = "oc96.icns"
 )
