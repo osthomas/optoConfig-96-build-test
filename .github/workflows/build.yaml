@@ -90,7 +90,8 @@ jobs:
       - name: Build package
         run: |
           pyinstaller optoConfig96.spec
-          create-dmg --volname "optoConfig96" darwin.dmg dist/optoConfig96-*.app
+          chmod +x create_dmg.sh
+          ./create_dmg.sh
 
       - uses: actions/upload-artifact@v3
         with:
