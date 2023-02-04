@@ -86,5 +86,5 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name = name + ".app",
-    icon = "oc96.icns"
+    icon = "optoConfig96/resources/oc96.icns"
 )
