@@ -4,8 +4,8 @@ rm -rf dmg
 mkdir dmg
 cp -r dist/optoConfig96.app dmg
 
-readme="dmg/Trouble opening? READ ME!.txt"
-cat << EOF
+readme='Trouble opening? READ ME!.txt'
+cat > "dmg/${readme}" << EOF
 After dragging optoConfig96 into your Applications directory, you may be shown
 a popup with one of these messages:
 
@@ -20,7 +20,7 @@ You can also go to "System Preferences" > Security & Privacy > General Tab",
 and choose "Open Anyway" for optoConfig after having tried to open it once.
 
 You only need to do this when launching optoConfig96 for the first time.
-EOF > "${readme}"
+EOF
 
 # Create a .dmg archive from the .app after building
 create-dmg \
@@ -28,9 +28,9 @@ create-dmg \
     --volicon "optoConfig96/resources/oc96.icns" \
     --window-size 600 300 \
     --icon-size 100 \
-    --icon "optoConfig96.app" 100 120 \
-    --icon "${readme}" 100 120 \
+    --icon "optoConfig96.app" 0 120 \
+    --icon "${readme}" 300 60 \
     --hide-extension "optoConfig96.app" \
     --hide-extension "${readme}" \
     --app-drop-link 500 120 \
-    darwin.dmg dist/optoConfig96.app
+    darwin.dmg dmg
