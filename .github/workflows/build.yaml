@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - "v*"
+      - "!v*post*"  # Do not build on post-releases (pypi only)
 
 jobs:
   build-linux:
