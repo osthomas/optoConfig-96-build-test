@@ -4,8 +4,8 @@ rm -rf dmg
 mkdir dmg
 cp -r dist/optoConfig96.app dmg
 
-readme="dmg/Trouble opening? READ ME!.txt"
-cat > "${readme}" << EOF
+readme='Trouble opening? READ ME!.txt'
+cat > "dmg/${readme}" << EOF
 After dragging optoConfig96 into your Applications directory, you may be shown
 a popup with one of these messages:
 
