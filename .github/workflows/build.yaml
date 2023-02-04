@@ -58,11 +58,10 @@ jobs:
 
       - name: Build package
         run: |
-          mkdir -p build/win32
-          python freeze.py build
+          pyinstaller optoConfig96.spec
 
       - name: Compress package
-        run: 7z a -tzip windows.zip build/win32/*
+        run: 7z a -tzip windows.zip dist/optoConfig96/*
       - uses: actions/upload-artifact@v3
         with:
           name: build-archives
@@ -82,19 +81,16 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Install package
+      - name: Install package and dependencies
         run: |
+          brew install create-dmg
           python -m pip install --upgrade pip wheel
           python -m pip install ".[build]"
-          brew install libiodbc
-          # cx_freeze looks for a library in a weird spot
-          mkdir -p /Applications/Postgres.app/Contents/Versions/9.6/lib/
-          ln -s /usr/local/opt/libpq/lib/libpq.5.dylib /Applications/Postgres.app/Contents/Versions/9.6/lib/libpq.5.dylib
 
       - name: Build package
         run: |
-          python freeze.py build
-          mv optoConfig96-*.dmg darwin.dmg
+          pyinstaller optoConfig96.spec
+          create-dmg --volname "optoConfig96" darwin.dmg dist/optoConfig96-*.app
 
       - uses: actions/upload-artifact@v3
         with:
