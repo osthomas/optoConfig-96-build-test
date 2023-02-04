@@ -9,4 +9,4 @@ create-dmg \
     --icon "optoConfig96.app" 175 120 \
     --hide-extension "optoConfig96.app" \
     --app-drop-link 425 120 \
-    optoConfig96.dmg dist/optoConfig96.app
+    darwin.dmg dist/optoConfig96.app
