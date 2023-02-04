@@ -28,9 +28,9 @@ create-dmg \
     --volicon "optoConfig96/resources/oc96.icns" \
     --window-size 600 300 \
     --icon-size 100 \
-    --icon "optoConfig96.app" 100 120 \
-    --icon "${readme}" 100 120 \
+    --icon "optoConfig96.app" 0 120 \
+    --icon "${readme}" 200 60 \
     --hide-extension "optoConfig96.app" \
     --hide-extension "${readme}" \
-    --app-drop-link 500 120 \
-    darwin.dmg dist/optoConfig96.app
+    --app-drop-link 400 120 \
+    darwin.dmg dmg
