@@ -1,11 +1,13 @@
 #!/bin/bash
 
-rm -rf dmg
-mkdir dmg
-cp -r dist/optoConfig96.app dmg
+# Remove build intermediate from dist/ directory to not include it in the .dmg
+# when choosing dist/ as the source folder for create-dmg
+# Copying the .app into a dedicated dmg/ directory appears to mess with code
+# signing. Don't touch it.
+rm -r dist/optoConfig96
 
 readme='Trouble opening? READ ME!.txt'
-cat > "dmg/${readme}" << EOF
+cat > "dist/${readme}" << EOF
 After dragging optoConfig96 into your Applications directory, you may be shown
 a popup with one of these messages:
 
@@ -33,4 +35,4 @@ create-dmg \
     --hide-extension "optoConfig96.app" \
     --hide-extension "${readme}" \
     --app-drop-link 500 120 \
-    darwin.dmg dmg
+    darwin.dmg dist
