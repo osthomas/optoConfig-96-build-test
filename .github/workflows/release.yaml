@@ -22,11 +22,14 @@ jobs:
           mv windows.zip "windows_optoConfig96-${RELEASE_VERSION}.zip"
           mv darwin.dmg "macos_optoConfig96-${RELEASE_VERSION}.dmg"
 
+      # Checkout for CHANGELOG
+      - uses: actions/checkout@v3
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           name: optoConfig96 ${{ env.RELEASE_VERSION }}
-          # body_path: ${{ github.workspace }}-CHANGELOG.txt
+          body_path: CHANGELOG.txt
           fail_on_unmatched_files: true
           files: |
             windows_optoConfig96-*.zip
