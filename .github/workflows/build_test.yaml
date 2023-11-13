@@ -1,0 +1,80 @@
+name: build_test
+
+on:
+  push
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip wheel build
+
+      - name: Build package
+        run: |
+          python -m build
+          # Make a directory that matches the dist* glob in upload-artifact
+          # in order to upload the built package in a subdirectory.
+          mkdir dist_stub
+
+
+  build-win:
+    runs-on: windows-latest
+
+    # First check if doc versions match
+    needs: [build-linux]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install package
+        run: |
+          python -m pip install --upgrade pip wheel
+          python -m pip install ".[build]"
+
+      - name: Build package
+        run: |
+          pyinstaller optoConfig96.spec
+
+      - name: Compress package
+        run: 7z a -tzip windows.zip ./dist/*
+
+
+  build-macos:
+    runs-on: macos-11
+
+    # First check if doc versions match
+    needs: [build-linux]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install package and dependencies
+        run: |
+          brew install create-dmg
+          python -m pip install --upgrade pip wheel
+          python -m pip install ".[build]"
+
+      - name: Build package
+        run: |
+          pyinstaller optoConfig96.spec
+          chmod +x create_dmg.sh
+          # Sign after removal of offending packages (see optoConfig96.spec)
+          codesign -s - --force --all-architectures --timestamp --deep dist/optoConfig96.app
+          ./create_dmg.sh
