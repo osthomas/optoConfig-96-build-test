@@ -24,6 +24,7 @@ from .ui import *
 import os
 import sys
 import json
+import platformdirs
 
 
 class Options(HasTraits):
@@ -49,6 +50,7 @@ class Options(HasTraits):
         ),
         kind='modal',
         title='Preferences',
+        resizable = True,
         buttons=OKCancelButtons)
 
     def to_dict(self):
@@ -71,7 +73,7 @@ class Config(HasTraits):
 
     def init(self):
         if not self.path:
-            self.path = os.path.join(os.path.expanduser('~'), 'optoPlate96')
+            self.path = platformdirs.user_config_dir("optoConfig96")
         if not os.path.exists(self.path):
             self.create_cfg_path()
 

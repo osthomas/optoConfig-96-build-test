@@ -1,3 +1,5 @@
 ## 1.0.6
 
 * Fix: compatibility with Python 3.10 and 3.11 (#3)
+* Change: changed default directory of configuration file to conform to
+  platform conventions
