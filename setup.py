@@ -27,12 +27,14 @@ setuptools.setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
         'Operating System :: OS Independent',
     ],
     keywords='biology optogenetics optoplate gui',
     install_requires=[
-        'traits>=6.2.0',
-        'traitsui>=7.2.1',
+        'traits>=6.2.0,<7.0',
+        'traitsui>=7.2.1,<8.0',
         'PyQt5>=5.15.4,<=5.15.7',
         'pygments>=2.9.0',
         'numpy>=1.21.1,<=1.23.5',
@@ -43,7 +45,7 @@ setuptools.setup(
             "pyinstaller>=5.7.0"
         ]
     },
-    python_requires='>=3.7,<3.10',
+    python_requires='>=3.7,<3.12',
     package_data={
         pkg_name: [
             'resources/appicon.png',

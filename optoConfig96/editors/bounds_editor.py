@@ -36,12 +36,15 @@ validation: min and max cannot be exceeded by entering values in the text box
 Furthermore, this suffers from the same limitation as the range editor:
 Entering commas treats the value as tuple, not a decimal number, which
 raises an unhandled TypeError - fixed here.
+
+Also handles explicitly casting slider values to int for dependency with
+Python>=3.10
 """
 
 import six
 
 from traitsui.qt4.extra.bounds_editor import _BoundsEditor as _OriginalBoundsEditor
-from traitsui.qt4.extra.bounds_editor import BoundsEditor as OriginalBoundsEditor
+from traitsui.qt4.extra.range_slider import RangeSlider as OriginalRangeSlider
 
 
 class _BoundsEditor(_OriginalBoundsEditor):
@@ -68,7 +71,42 @@ class _BoundsEditor(_OriginalBoundsEditor):
         super().update_high_on_enter()
 
 
-class BoundsEditor(OriginalBoundsEditor):
+class RangeSlider(OriginalRangeSlider):
+    """
+    Add additional indirection to the RangeSlider class in order to explicitly
+    cast values to int.
+    Fix for: https://github.com/enthought/traitsui/issues/1906
+    """
+
+    @property
+    def _low(self):
+        try:
+            return int(self.__low)
+        except TypeError:
+            return self.__low
+
+    @_low.setter
+    def _low(self, value):
+        self.__low = value
+
+    @property
+    def _high(self):
+        try:
+            return int(self.__high)
+        except TypeError:
+            return self.__high
+
+    @_high.setter
+    def _high(self, value):
+        self.__high = value
+
+
+# Dependency injection of fixed RangeEditor
+from traitsui.qt4.extra import bounds_editor as DI_bounds_editor
+DI_bounds_editor.RangeSlider = RangeSlider
+
+
+class BoundsEditor(DI_bounds_editor.BoundsEditor):
     def _get_simple_editor_class(self):
         return _BoundsEditor
 
