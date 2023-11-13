@@ -1,5 +1,7 @@
 __pycache__
 dist/
+build/
+*.egg-info/
 optoPlate96/resources/*icon*
 !icon_master.png
 !*icon.svg
