@@ -85,3 +85,20 @@ app = BUNDLE(
     icon = "optoConfig96/resources/oc96.icns",
     version = __version__
 )
+# NOTE:
+# As of 2023-02-04, pyinstaller 5.7.0, the call to `codesign` fails due to
+# subcomponents in PyQt5/qml. Several unneeded QT components are included
+# by pyinstaller, of which this is one. Removing this gets rid of the error,
+# and prevents the "This app is damaged" popup
+if sys.platform == "darwin":
+    to_remove = [
+        os.path.join("qml", "QtQml", "Models.2"),
+        os.path.join("qml", "QtQml", "WorkerScript.2"),
+        os.path.join("qml", "QtQuick.2"),
+        os.path.join("qml", "QtQuick", "Particles.2"),
+        os.path.join("qml", "QtQuick", "Templates.2"),
+        os.path.join("qml", "QtQuick", "Controls.2"),
+        os.path.join("qml", "QtQuick", "Window.2"),
+    ]
+    for p in to_remove:
+        shutil.rmtree(os.path.join("dist", "optoConfig96.app", "Contents", "MacOS", "PyQt5", "Qt5", p))
