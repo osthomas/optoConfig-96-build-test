@@ -1,6 +1,6 @@
 # optoConfig-96 - Interactive configuration of experiments using the optoPlate-96
 
-User guide for version 1.0.5.
+User guide for version 1.0.6.
 
 If optoConfig-96 was useful to you, please consider citing the paper:
 
