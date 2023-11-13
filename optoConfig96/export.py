@@ -695,88 +695,16 @@ class InoTemplate(utils.Updateable, InoMemreq):
         self.led_types = InoLedTypeCollection(plate.led_types, validate=validate)
         self.done_after = plate.done_after()
 
-    # Path to the Arduino IDE executable
-    ide_path = Property
-
-    def _get_ide_path(self):
-        options_path = config.op96Config['arduino_path']
-        if sys.platform == 'win32':
-            return os.path.join(os.path.split(options_path)[0], 'arduino_debug.exe')
-        if sys.platform == 'darwin':
-            return os.path.join(options_path, 'Contents', 'MacOS', 'Arduino')
-        else:
-            return options_path
-
-    # Version information about a path.
-    path_versions = Dict
-
-    def query_version(self):
-        """
-        Query the version of an Arduino executable and store it in
-        `self.path_versions`.
-        """
-        try:
-            version = self.path_versions[self.ide_path]
-            if version is None:
-                raise KeyError
-        except KeyError:
-            self.start_update()
-            try:
-                result = self.get_arduino_output(['--version'])
-                version = re.search(r'Arduino.*(\d+\.\d+.\d+)', result).groups()[0]
-                version = version.split('.')
-                version = tuple([int(x) for x in version])
-                self.path_versions[self.ide_path] = version
-            except (FileNotFoundError, PermissionError, OSError):
-                msg = 'Could not determine the version of the Arduino IDE. Check if the correct path is set under Configuration > Preferences.'
-                msg += '\nIf correcting the path does not resolve the problem, please open the Arduino IDE manually and copy the code into a new sketch.'
-                utils.error(message=msg, title='Could not open IDE')
-                version = None
-            finally:
-                self.stop_update()
-
-        return version
-
-    @staticmethod
-    def version_valid(version):
-        # Skip version check for now.
-        # return version in constants.ARDUINO_TESTED_VERSIONS
-        return True
-
-    def get_arduino_output(self, cli_options):
-        """
-        Get output from the Arduino executable.
-
-        Parameters
-        ----------
-        cli_options : list
-            Command line options to pass to the arduino executable.
-        """
-        cmd = [self.ide_path] + cli_options
-        result = subprocess.check_output(cmd).decode('ascii')
-
-        # The result may contain log4j output. Try to get rid of those
-        # disturbances.
-        result = result.splitlines()
-        result = [line for line in result if 'log4j' not in line]
-
-        if len(result) == 1:
-            return result[0].strip()
-        else:
-            # ambivalent or no result
-            return ''
-
     # Path to the Arduino Sketchbook
-    sketchbook_path = Property
-
-    @cached_property
-    def _get_sketchbook_path(self):
-        result = self.get_arduino_output(['--get-pref', 'sketchbook.path'])
-        sketchbook_path = os.path.normpath(result)
-        if not os.path.exists(sketchbook_path):
-            msg = "The Arduino Sketchbook path was detected at '%s', but it does not exist." % sketchbook_path
+    @property
+    def sketchbook_path(self):
+        sketchbook_path = os.path.normpath(config.op96Config["sketch_path"])
+        try:
+            os.makedirs(sketchbook_path, exist_ok = True)
+        except PermissionError:
+            msg = "The Arduino Sketchbook path set to '%s', but it does not exist and could not be created." % sketchbook_path
             msg += '\nPlease open the Arduino IDE manually and copy the generated code into a new sketch.'
-            error(msg, 'Sketchbook path not found.')
+            error(msg, 'Sketchbook path inaccessible.')
             return None
         else:
             return sketchbook_path
@@ -863,19 +791,11 @@ class InoTemplate(utils.Updateable, InoMemreq):
 
     def _to_ide_changed(self):
         """ Try to send the code to the Arduino IDE. """
-        # Skip version check, just make sure we find the IDE
-        version = self.query_version()
-        if version is None:
-            return False
-
         try:
             inopath = self.inopath()
             if inopath is not None:
                 self.start_update()
-                try:
-                    os.makedirs(inopath)
-                except FileExistsError:
-                    pass
+                os.makedirs(inopath, exist_ok = True)
                 fname = os.path.split(inopath)[-1] + '.ino'
                 fpath = os.path.join(inopath, fname)
                 with open(fpath, 'w') as f:
@@ -887,8 +807,8 @@ class InoTemplate(utils.Updateable, InoMemreq):
             msg += '\nPlease open the Arduino IDE manually and copy the code into a new sketch.'
             utils.error(message=msg, title='Could not open IDE')
         except Exception:
-            raise
             msg = 'The Arduino IDE could not be opened. Check if the correct path is set under Configuration > Preferences.'
+            msg = 'NOTE: For the Arduino IDE 1.8.x under Windows, this must be set to the path of "arduino_debug.exe", NOT "arduino.exe"!'
             msg += '\nIf correcting the path does not resolve the problem, please open the Arduino IDE manually and copy the code into a new sketch.'
             utils.error(message=msg, title='Could not open IDE')
         finally:

@@ -3,3 +3,5 @@
 * Fix: compatibility with Python 3.10 and 3.11 (#3)
 * Change: changed default directory of configuration file to conform to
   platform conventions
+* Fix/Feature: The Sketch path is no longer determined automatically. This is
+  now a new configuration option.

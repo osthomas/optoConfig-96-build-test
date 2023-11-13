@@ -29,6 +29,7 @@ import platformdirs
 
 class Options(HasTraits):
     arduino_path = File(label='Path to Arduino IDE')
+    sketch_path = Directory(label = 'Sketch Location', tooltip='Default save location for optoConfig96 Arduino Sketches')
 
     def _arduino_path_default(self):
         if sys.platform == 'linux':
@@ -37,6 +38,9 @@ class Options(HasTraits):
             return os.path.join(os.sep, 'Applications', 'Arduino.app')
         if sys.platform == 'win32':
             return os.path.join('C:', os.sep, 'Program Files (x86)', 'Arduino', 'arduino_debug.exe')
+
+    def _sketch_path_default(self):
+        return platformdirs.user_data_dir("optoConfig96")
 
     changed = Event
 
@@ -47,6 +51,7 @@ class Options(HasTraits):
     view = View(
         VGroup(
             Item('arduino_path', editor=FileEditor(dialog_style='open')),
+            Item('sketch_path', editor=DirectoryEditor(dialog_style='open')),
         ),
         kind='modal',
         title='Preferences',
@@ -55,7 +60,7 @@ class Options(HasTraits):
 
     def to_dict(self):
         d = {}
-        for attr in ('arduino_path',):
+        for attr in ('arduino_path', 'sketch_path'):
             d[attr] = getattr(self, attr)
         return d
 
@@ -77,7 +82,7 @@ class Config(HasTraits):
         if not os.path.exists(self.path):
             self.create_cfg_path()
 
-        self.cfg_file = os.path.join(self.path, 'op96_config.cfg')
+        self.cfg_file = os.path.join(self.path, 'optoConfig96.json')
         if os.path.exists(self.cfg_file):
             self.options = self.read_cfg()
         else:
