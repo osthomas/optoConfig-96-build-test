@@ -42,7 +42,7 @@ setuptools.setup(
     ],
     extras_require = {
         'build': [
-            "pyinstaller>=5.7.0"
+            "pyinstaller==5.7.0"
         ]
     },
     python_requires='>=3.7,<3.12',
