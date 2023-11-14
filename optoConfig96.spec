@@ -24,9 +24,9 @@ hiddenimports = [
     "traitsui.toolkits",
     "traitsui.qt4",
     "pyface.toolkits",
-    "pyface.ui.qt4"
+    "pyface.ui.qt"
 ]
-hiddenimports += collect_submodules('pyface.ui.qt4')
+hiddenimports += collect_submodules('pyface.ui.qt')
 hiddenimports += collect_submodules('traitsui.qt4')
 
 block_cipher = None
